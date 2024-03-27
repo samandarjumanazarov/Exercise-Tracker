@@ -22,7 +22,6 @@ const exerciseSchema = new Schema({
     type: Number,
     validate: {
       validator: function(value) {
-        // Check if duration is a number or not
         if (isNaN(value)) {
           throw new Error(`Cast to Number failed for value "${value}" (type ${typeof value}) at path "duration"`);
         }
@@ -34,19 +33,18 @@ const exerciseSchema = new Schema({
   },
   date: {
     type: Date,
-    default: Date.now, // Default value is current date
+    default: Date.now, 
     set: function(date) {
-      // Format date string if provided
+      
       if (!date) {
-        return undefined; // Set to undefined if no date provided
+        return undefined; 
       } else if (!(date instanceof Date)) {
-        return new Date(date); // Convert string to Date object
+        return new Date(date); 
       } else {
-        return date; // Return date as is
+        return date; 
       }
     },
     get: function(date) {
-      // Format date as string
       return date ? date.toDateString() : undefined;
     }
   }
@@ -92,46 +90,11 @@ app.get('/api/users', async(req, res) => {
   }
 })
 
-// app.post('/api/users/:_id/exercises', async(req, res) => {
-//   try {
-//     const { _id, description, duration, date } = req.body;
-//     console.log(req.body)
-//     if (!_id) {
-//       return res.status(400).json({ error: 'User ID is required' });
-//     }
-//     const user = await User.findById(_id);
 
-//     if (!user) {
-//       return res.status(404).json({ error: 'User not found' });
-//     }
-
-//     const exercise = new Exercise({
-//       description,
-//       duration,
-//       date
-//     });
-
-//     await exercise.save();
-
-//     user.exercises.push(exercise);
-//     await user.save();
-
-//     // Return the user object with the added exercise fields
-//     res.json({
-//       _id: user._id,
-//       username: user.username,
-//       exercises: user.exercises
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Failed to add exercise' });
-//   }
-// })
 app.post('/api/users/:_id/exercises', async (req, res) => {
   try {
-    const { _id: urlId } = req.params; // Get _id from URL parameters
-    const { description, duration, date } = req.body; // Get other exercise details from request body
-
+    const { _id: urlId } = req.params; 
+    const { description, duration, date } = req.body; 
 
     if (!urlId && !_id) {
       return res.status(400).json({ error: 'User ID is required' });
@@ -153,14 +116,10 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       date
     });
 
-    // Save the exercise to the database
     await exercise.save();
-
-    // Add the exercise to the user's exercises array
     user.exercises.push(exercise);
     await user.save();
 
-    
     res.json({
       _id: user._id,
       username: user.username,
@@ -198,20 +157,14 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       exercisesQuery = exercisesQuery.limit(parseInt(limit));
     }
     const exercises = await exercisesQuery.exec();
-
-    // // Get the exercises belonging to the user
-    // const exercises = await Exercise.find({ userId });
-    // Calculate the count of exercises
     const count = exercises.length;
-
-    // Prepare the log array containing exercise details
     const log = exercises.map(exercise => ({
       description: exercise.description,
       duration: exercise.duration,
-      date: exercise.date // Convert date to string format
+      date: exercise.date.toDateString()
     }));
 
-    // Return the user object with count and log array
+    
     res.json({
       _id: user._id,
       username: user.username,
@@ -223,7 +176,6 @@ app.get('/api/users/:_id/logs', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
