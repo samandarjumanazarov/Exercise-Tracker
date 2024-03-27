@@ -161,7 +161,7 @@ app.get('/api/users/:_id/logs', async (req, res) => {
     const log = exercises.map(exercise => ({
       description: exercise.description,
       duration: exercise.duration,
-      date: exercise.date.toDateString()
+      date: exercise.date instanceof Date ? exercise.date.toDateString() : exercise.date
     }));
 
     
